@@ -15,7 +15,22 @@ Env.Load(); // טוען את קובץ ה-ENV
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://+:80");
 // טעינת הגדרות MongoDB מתוך קובץ התצורה (appsettings.json)
-builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
+// builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
+builder.Services.AddSingleton<IMongoClient>(sp =>
+{
+    var mongoConnectionString = Environment.GetEnvironmentVariable("MONGO_CONNECTION");
+    if (string.IsNullOrEmpty(mongoConnectionString))
+    {
+        throw new Exception("MONGO_CONNECTION environment variable is missing.");
+    }
+
+    return new MongoClient(mongoConnectionString);
+});
+builder.Services.AddSingleton<IMongoDatabase>(sp =>
+{
+    var client = sp.GetRequiredService<IMongoClient>();
+    return client.GetDatabase("ExamPRO");
+});
 
 // קבלת מפתח סודי מתוך קובץ התצורה
 var secretKey = builder.Configuration["JwtSettings:SecretKey"];
