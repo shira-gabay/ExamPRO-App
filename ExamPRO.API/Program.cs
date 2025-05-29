@@ -13,7 +13,7 @@ using DotNetEnv;
 Env.Load(); // טוען את קובץ ה-ENV
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.WebHost.UseUrls("http://+:80");
 // טעינת הגדרות MongoDB מתוך קובץ התצורה (appsettings.json)
 builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
 
