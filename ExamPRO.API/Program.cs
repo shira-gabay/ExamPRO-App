@@ -85,11 +85,10 @@ var app = builder.Build();
 // סדר Middleware נכון
 app.UseCors("AllowAll");
 
-if (app.Environment.IsDevelopment())
-{
+
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
