@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: ExamPRO-App
+    env: docker
+    plan: free
+    autoDeploy: true
+    dockerfilePath: Dockerfile
+    buildCommand: ""
+    startCommand: "dotnet ExamPRO.API.dll"
+    envVars:
+      - key: ASPNETCORE_URLS
+        value: http://+:80
