@@ -19,7 +19,8 @@ else
 }
 
 var builder = WebApplication.CreateBuilder(args);
-
+// חובה להוסיף את זה!
+builder.Configuration.AddEnvironmentVariables();
 // 🔍 לוגים: בדיקת כל הקונפיגורציה הקריטית
 Console.WriteLine("=== CONFIGURATION CHECK ===");
 Console.WriteLine($"MONGO_CONNECTION => {builder.Configuration["MONGO_CONNECTION"]}");
