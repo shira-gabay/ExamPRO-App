@@ -16,21 +16,23 @@ if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development
 var builder = WebApplication.CreateBuilder(args);
 
 // קונפיגורציה של MongoDbSettings מתוך appsettings או ENV ברנדר
-builder.Services.Configure<MongoDbSettings>(
-    builder.Configuration.GetSection("MongoDbSettings"));
+// builder.Services.Configure<MongoDbSettings>(
+//     builder.Configuration.GetSection("MongoDbSettings"));
 
 // יצירת MongoClient מתוך ההגדרות
 builder.Services.AddSingleton<IMongoClient>(sp =>
 {
-    var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
-    return new MongoClient(settings.ConnectionString);
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var connectionString = configuration["MONGO_CONNECTION"];
+    return new MongoClient(connectionString);
 });
 
 builder.Services.AddSingleton<IMongoDatabase>(sp =>
 {
-    var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var databaseName = configuration["MongoDbSettings__DatabaseName"];
     var client = sp.GetRequiredService<IMongoClient>();
-    return client.GetDatabase(settings.DatabaseName);
+    return client.GetDatabase(databaseName);
 });
 
 // JWT

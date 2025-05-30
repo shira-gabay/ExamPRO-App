@@ -13,10 +13,9 @@ namespace ExamPRO.API.Services
         private readonly IMongoCollection<Exam> _examsCollection;
 private readonly IMongoCollection<SubjectCategory> _subjectsCollection;
 
-        public ExamService(IOptions<MongoDbSettings> dbSettings)
+        public ExamService(IMongoDatabase database)
         {
-            var mongoClient = new MongoClient(dbSettings.Value.ConnectionString);
-            var database = mongoClient.GetDatabase(dbSettings.Value.DatabaseName);
+
             _examsCollection = database.GetCollection<Exam>("Exams");
             _subjectsCollection = database.GetCollection<SubjectCategory>("SubjectCategories");
 
