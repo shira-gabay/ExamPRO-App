@@ -21,57 +21,65 @@ else
 }
 
 var builder = WebApplication.CreateBuilder(args);
-// חובה להוסיף את זה!
+
+// חובה להוסיף את משתני הסביבה לקונפיגורציה
 builder.Configuration.AddEnvironmentVariables();
+
+// אופציונלי - הדפסת כל המשתנים כדי לוודא טעינה
+foreach (var kvp in builder.Configuration.AsEnumerable())
+{
+    Console.WriteLine($"CONFIG: {kvp.Key} = {kvp.Value}");
+}
 foreach (var env in Environment.GetEnvironmentVariables().Keys)
 {
     Console.WriteLine($"ENV: {env} = {Environment.GetEnvironmentVariable(env.ToString())}");
 }
+
 // 🔍 לוגים: בדיקת כל הקונפיגורציה הקריטית
 Console.WriteLine("=== CONFIGURATION CHECK ===");
-Console.WriteLine($"MONGO_CONNECTION => {builder.Configuration["MONGO_CONNECTION"]}");
-Console.WriteLine($"MongoDbSettings__DatabaseName => {builder.Configuration["MongoDbSettings__DatabaseName"]}");
+
+// קח קודם את משתנה הסביבה MONGO_CONNECTION ואם אין, נסה מהקונפיגורציה
+var mongoConnection = Environment.GetEnvironmentVariable("MONGO_CONNECTION") 
+                      ?? builder.Configuration["MONGO_CONNECTION"];
+
+Console.WriteLine($"MONGO_CONNECTION => {mongoConnection}");
+
+// ככה משתנה סביבה עם __ הופך ל- MongoDbSettings:DatabaseName בקונפיגורציה
+var mongoDatabaseName = Environment.GetEnvironmentVariable("MongoDbSettings__DatabaseName") 
+                        ?? builder.Configuration["MongoDbSettings:DatabaseName"];
+
+Console.WriteLine($"MongoDbSettings__DatabaseName => {mongoDatabaseName}");
 Console.WriteLine($"JwtSettings:SecretKey => {(string.IsNullOrEmpty(builder.Configuration["JwtSettings:SecretKey"]) ? "❌ MISSING" : "✅ PRESENT")}");
 Console.WriteLine("============================");
-Console.WriteLine($"🔍 DB from Env: '{Environment.GetEnvironmentVariable("MongoDbSettings__DatabaseName")}'");
-Console.WriteLine($"🔍 DB from Config: '{builder.Configuration["MongoDbSettings__DatabaseName"]}'");
+
+// חובה שיהיה מחרוזת חיבור
+if (string.IsNullOrEmpty(mongoConnection))
+{
+    throw new Exception("Missing MongoDB connection string (MONGO_CONNECTION).");
+}
+
+// ברירת מחדל לשם מסד הנתונים
+if (string.IsNullOrEmpty(mongoDatabaseName))
+{
+    mongoDatabaseName = "ExamPRO";
+    Console.WriteLine("Using default database name: ExamPRO");
+}
 
 builder.Services.AddSingleton<IMongoClient>(sp =>
 {
-    var configuration = sp.GetRequiredService<IConfiguration>();
-    var connectionString = configuration["MONGO_CONNECTION"];
-
     Console.WriteLine("🟡 Loading MongoDB settings...");
-    Console.WriteLine($"🔐 MONGO_CONNECTION: {connectionString}");
+    Console.WriteLine($"🔐 MONGO_CONNECTION: {mongoConnection}");
 
-    if (string.IsNullOrEmpty(connectionString))
-    {
-        Console.WriteLine("❌ ERROR: MONGO_CONNECTION is missing.");
-        throw new Exception("Missing MongoDB connection string.");
-    }
-
-    return new MongoClient(connectionString);
+    return new MongoClient(mongoConnection);
 });
 
 builder.Services.AddSingleton<IMongoDatabase>(sp =>
 {
-    // נסה קודם משתנה סביבה, ואז קונפיגורציה
-    var databaseName = Environment.GetEnvironmentVariable("MongoDbSettings__DatabaseName") 
-                      ?? builder.Configuration["MongoDbSettings:DatabaseName"]
-                      ?? "ExamPRO"; // ברירת מחדל
-    
-    Console.WriteLine($"📂 Final DatabaseName: '{databaseName}'");
-    
-    if (string.IsNullOrEmpty(databaseName))
-    {
-        Console.WriteLine("❌ ERROR: Database name is missing.");
-        throw new Exception("Missing MongoDB database name.");
-    }
-
     var client = sp.GetRequiredService<IMongoClient>();
-    Console.WriteLine($"✅ Creating MongoDatabase with name: {databaseName}");
-    return client.GetDatabase(databaseName);
+    Console.WriteLine($"✅ Creating MongoDatabase with name: {mongoDatabaseName}");
+    return client.GetDatabase(mongoDatabaseName);
 });
+
 
 // JWT
 var secretKey = builder.Configuration["JwtSettings:SecretKey"];
