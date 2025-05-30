@@ -10,20 +10,35 @@ using ExamPRO.API.Settings;
 // DotEnv רק לפיתוח מקומי
 if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
 {
+    Console.WriteLine("Environment: Development");
     DotNetEnv.Env.Load();
+}
+else
+{
+    Console.WriteLine("Environment: Production");
 }
 
 var builder = WebApplication.CreateBuilder(args);
 
-// קונפיגורציה של MongoDbSettings מתוך appsettings או ENV ברנדר
-// builder.Services.Configure<MongoDbSettings>(
-//     builder.Configuration.GetSection("MongoDbSettings"));
+// 🔍 לוגים: בדיקת כל הקונפיגורציה הקריטית
+Console.WriteLine("=== CONFIGURATION CHECK ===");
+Console.WriteLine($"MONGO_CONNECTION => {builder.Configuration["MONGO_CONNECTION"]}");
+Console.WriteLine($"MongoDbSettings__DatabaseName => {builder.Configuration["MongoDbSettings__DatabaseName"]}");
+Console.WriteLine($"JwtSettings:SecretKey => {(string.IsNullOrEmpty(builder.Configuration["JwtSettings:SecretKey"]) ? "❌ MISSING" : "✅ PRESENT")}");
+Console.WriteLine("============================");
 
-// יצירת MongoClient מתוך ההגדרות
 builder.Services.AddSingleton<IMongoClient>(sp =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
     var connectionString = configuration["MONGO_CONNECTION"];
+
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+        Console.WriteLine("❌ MONGO_CONNECTION is missing or empty.");
+        throw new Exception("MONGO_CONNECTION is not defined.");
+    }
+
+    Console.WriteLine("✅ MongoClient created with connection string.");
     return new MongoClient(connectionString);
 });
 
@@ -31,7 +46,15 @@ builder.Services.AddSingleton<IMongoDatabase>(sp =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
     var databaseName = configuration["MongoDbSettings__DatabaseName"];
+
+    if (string.IsNullOrWhiteSpace(databaseName))
+    {
+        Console.WriteLine("❌ MongoDbSettings__DatabaseName is missing or empty.");
+        throw new ArgumentNullException("MongoDbSettings__DatabaseName", "Database name must be set in environment variables.");
+    }
+
     var client = sp.GetRequiredService<IMongoClient>();
+    Console.WriteLine($"✅ MongoDatabase created with name: {databaseName}");
     return client.GetDatabase(databaseName);
 });
 
@@ -39,7 +62,12 @@ builder.Services.AddSingleton<IMongoDatabase>(sp =>
 var secretKey = builder.Configuration["JwtSettings:SecretKey"];
 if (string.IsNullOrEmpty(secretKey))
 {
+    Console.WriteLine("❌ JWT Secret Key is missing!");
     throw new Exception("JWT Secret Key is missing from configuration.");
+}
+else
+{
+    Console.WriteLine("✅ JWT Secret Key loaded.");
 }
 var key = Encoding.UTF8.GetBytes(secretKey);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -96,4 +124,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+Console.WriteLine("🚀 App is starting...");
 app.Run();
