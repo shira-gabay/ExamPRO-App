@@ -6,6 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
      <UserSecretsId>exampro-api-guid-12345</UserSecretsId>
   </PropertyGroup>
+<ItemGroup>
+  <Compile Include="Settings\MongoDbSettings.cs" />
+</ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.7.416.13" />
