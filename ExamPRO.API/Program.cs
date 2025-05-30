@@ -7,6 +7,8 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using ExamPRO.API.Settings;
 
+
+
 // DotEnv רק לפיתוח מקומי
 if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
 {
@@ -21,7 +23,10 @@ else
 var builder = WebApplication.CreateBuilder(args);
 // חובה להוסיף את זה!
 builder.Configuration.AddEnvironmentVariables();
-
+foreach (var env in Environment.GetEnvironmentVariables().Keys)
+{
+    Console.WriteLine($"ENV: {env} = {Environment.GetEnvironmentVariable(env.ToString())}");
+}
 // 🔍 לוגים: בדיקת כל הקונפיגורציה הקריטית
 Console.WriteLine("=== CONFIGURATION CHECK ===");
 Console.WriteLine($"MONGO_CONNECTION => {builder.Configuration["MONGO_CONNECTION"]}");
