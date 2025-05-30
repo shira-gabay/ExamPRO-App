@@ -31,14 +31,18 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
     var connectionString = configuration["MONGO_CONNECTION"];
+    var dbName = configuration["MongoDbSettings__DatabaseName"];
 
-    if (string.IsNullOrWhiteSpace(connectionString))
+    Console.WriteLine("🟡 Loading MongoDB settings...");
+    Console.WriteLine($"🔐 MONGO_CONNECTION: {connectionString}");
+    Console.WriteLine($"📂 MongoDbSettings__DatabaseName: {dbName}");
+
+    if (string.IsNullOrEmpty(connectionString))
     {
-        Console.WriteLine("❌ MONGO_CONNECTION is missing or empty.");
-        throw new Exception("MONGO_CONNECTION is not defined.");
+        Console.WriteLine("❌ ERROR: MONGO_CONNECTION is missing.");
+        throw new Exception("Missing MongoDB connection string.");
     }
 
-    Console.WriteLine("✅ MongoClient created with connection string.");
     return new MongoClient(connectionString);
 });
 
@@ -46,17 +50,17 @@ builder.Services.AddSingleton<IMongoDatabase>(sp =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
     var databaseName = configuration["MongoDbSettings__DatabaseName"];
-
-    if (string.IsNullOrWhiteSpace(databaseName))
+    if (string.IsNullOrEmpty(databaseName))
     {
-        Console.WriteLine("❌ MongoDbSettings__DatabaseName is missing or empty.");
-        throw new ArgumentNullException("MongoDbSettings__DatabaseName", "Database name must be set in environment variables.");
+        Console.WriteLine("❌ ERROR: Database name is missing.");
+        throw new Exception("Missing MongoDB database name.");
     }
 
     var client = sp.GetRequiredService<IMongoClient>();
-    Console.WriteLine($"✅ MongoDatabase created with name: {databaseName}");
+    Console.WriteLine($"✅ Creating MongoDatabase with name: {databaseName}");
     return client.GetDatabase(databaseName);
 });
+
 
 // JWT
 var secretKey = builder.Configuration["JwtSettings:SecretKey"];
