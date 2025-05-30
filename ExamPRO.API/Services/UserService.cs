@@ -10,14 +10,12 @@ namespace ExamPRO.API.Services
 {
     public class UserService
     {
-        private readonly IMongoCollection<User> _usersCollection;
+    private readonly IMongoCollection<User> _usersCollection;
 
-        public UserService(IOptions<MongoDbSettings> dbSettings)
-        {
-            var mongoClient = new MongoClient(dbSettings.Value.ConnectionString);
-            var database = mongoClient.GetDatabase(dbSettings.Value.DatabaseName);
-            _usersCollection = database.GetCollection<User>("Users");
-        }
+    public UserService(IMongoDatabase database)
+    {
+        _usersCollection = database.GetCollection<User>("Users");
+    }
 
         public async Task<List<User>> GetAsync() =>
             await _usersCollection.Find(_ => true).ToListAsync();

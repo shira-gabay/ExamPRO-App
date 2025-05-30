@@ -10,14 +10,12 @@ namespace ExamPRO.API.Services
 {
     public class SubjectCategoryService
     {
-        private readonly IMongoCollection<SubjectCategory> _categoriesCollection;
+    private readonly IMongoCollection<SubjectCategory> _categoriesCollection;
 
-        public SubjectCategoryService(IOptions<MongoDbSettings> dbSettings)
-        {
-            var mongoClient = new MongoClient(dbSettings.Value.ConnectionString);
-            var database = mongoClient.GetDatabase(dbSettings.Value.DatabaseName);
-            _categoriesCollection = database.GetCollection<SubjectCategory>("SubjectCategories");
-        }
+    public SubjectCategoryService(IMongoDatabase database)
+    {
+        _categoriesCollection = database.GetCollection<SubjectCategory>("SubjectCategories");
+    }
 
         public async Task<List<SubjectCategory>> GetAsync() =>
             await _categoriesCollection.Find(_ => true).ToListAsync();

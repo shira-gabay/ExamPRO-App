@@ -15,16 +15,14 @@ namespace ExamPRO.API.Services
 {
     public class StudyMaterialService
     {
-        private readonly IMongoCollection<StudyMaterial> _studyMaterialsCollection;
-        private readonly S3Service _s3Service;
+    private readonly IMongoCollection<StudyMaterial> _studyMaterialsCollection;
+    private readonly S3Service _s3Service;
 
-        public StudyMaterialService(IOptions<MongoDbSettings> dbSettings, S3Service s3Service)
-        {
-            var mongoClient = new MongoClient(dbSettings.Value.ConnectionString);
-            var database = mongoClient.GetDatabase(dbSettings.Value.DatabaseName);
-            _studyMaterialsCollection = database.GetCollection<StudyMaterial>("StudyMaterials");
-            _s3Service = s3Service;
-        }
+    public StudyMaterialService(IMongoDatabase database, S3Service s3Service)
+    {
+        _studyMaterialsCollection = database.GetCollection<StudyMaterial>("StudyMaterials");
+        _s3Service = s3Service;
+    }
 
         public async Task<List<StudyMaterial>> GetAsync() =>
             await _studyMaterialsCollection.Find(_ => true).ToListAsync();
