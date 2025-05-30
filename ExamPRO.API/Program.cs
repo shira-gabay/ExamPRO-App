@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
 using System.Text;
 using Microsoft.Extensions.Options;
+using ExamPRO.API.Settings;
 
 // DotEnv רק לפיתוח מקומי
 if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
