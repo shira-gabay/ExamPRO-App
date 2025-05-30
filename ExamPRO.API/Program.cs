@@ -1,47 +1,44 @@
-using ExamPRO.API.Settings;
 using ExamPRO.API.Services;
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using DotNetEnv;
+using MongoDB.Driver;
+using System.Text;
+using Microsoft.Extensions.Options;
 
-Env.Load(); // טוען את קובץ ה-ENV
+// DotEnv רק לפיתוח מקומי
+if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+{
+    DotNetEnv.Env.Load();
+}
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseUrls("http://+:80");
-// טעינת הגדרות MongoDB מתוך קובץ התצורה (appsettings.json)
-// builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
+
+// קונפיגורציה של MongoDbSettings מתוך appsettings או ENV ברנדר
+builder.Services.Configure<MongoDbSettings>(
+    builder.Configuration.GetSection("MongoDbSettings"));
+
+// יצירת MongoClient מתוך ההגדרות
 builder.Services.AddSingleton<IMongoClient>(sp =>
 {
-    var mongoConnectionString = Environment.GetEnvironmentVariable("MONGO_CONNECTION");
-    if (string.IsNullOrEmpty(mongoConnectionString))
-    {
-        throw new Exception("MONGO_CONNECTION environment variable is missing.");
-    }
-
-    return new MongoClient(mongoConnectionString);
+    var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
+    return new MongoClient(settings.ConnectionString);
 });
+
 builder.Services.AddSingleton<IMongoDatabase>(sp =>
 {
+    var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
     var client = sp.GetRequiredService<IMongoClient>();
-    return client.GetDatabase("ExamPRO");
+    return client.GetDatabase(settings.DatabaseName);
 });
 
-// קבלת מפתח סודי מתוך קובץ התצורה
+// JWT
 var secretKey = builder.Configuration["JwtSettings:SecretKey"];
 if (string.IsNullOrEmpty(secretKey))
 {
     throw new Exception("JWT Secret Key is missing from configuration.");
 }
-
 var key = Encoding.UTF8.GetBytes(secretKey);
-
-// הגדרת אימות באמצעות JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -55,14 +52,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// חיבור ל-MongoDB
-builder.Services.AddSingleton<IMongoClient>(sp =>
-{
-    var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
-    return new MongoClient(settings.ConnectionString);
-});
-
-// רישום שירותים (Dependency Injection)
+// Services
 builder.Services.AddSingleton<ExamService>();
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<StudyMaterialService>();
@@ -73,37 +63,30 @@ builder.Services.AddSingleton<IS3Service, S3Service>();
 builder.Services.AddSingleton<S3Service>();
 builder.Services.AddSingleton<JwtService>();
 
-
-
-// הגדרת CORS
+// CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        policy => policy.AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader());
+    options.AddPolicy("AllowAll", policy =>
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader());
 });
 
-// הוספת שירותי API
+// Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-
-// הוספת Swagger עם תמיכה בהעלאת קבצים
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "ExamPRO API", Version = "v1" });
-    c.OperationFilter<FileUploadOperationFilter>();  // ✅ מאפשר העלאת קבצים
+    c.OperationFilter<FileUploadOperationFilter>();
 });
 
 var app = builder.Build();
 
-// סדר Middleware נכון
+// Middleware
 app.UseCors("AllowAll");
-
-
-    app.UseSwagger();
-    app.UseSwaggerUI();
-
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
