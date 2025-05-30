@@ -26,6 +26,8 @@ Console.WriteLine($"MONGO_CONNECTION => {builder.Configuration["MONGO_CONNECTION
 Console.WriteLine($"MongoDbSettings__DatabaseName => {builder.Configuration["MongoDbSettings__DatabaseName"]}");
 Console.WriteLine($"JwtSettings:SecretKey => {(string.IsNullOrEmpty(builder.Configuration["JwtSettings:SecretKey"]) ? "❌ MISSING" : "✅ PRESENT")}");
 Console.WriteLine("============================");
+Console.WriteLine($"🔍 DB from Env: '{Environment.GetEnvironmentVariable("MongoDbSettings__DatabaseName")}'");
+Console.WriteLine($"🔍 DB from Config: '{builder.Configuration["MongoDbSettings__DatabaseName"]}'");
 
 builder.Services.AddSingleton<IMongoClient>(sp =>
 {
