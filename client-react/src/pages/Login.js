@@ -13,15 +13,22 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { setCurrentUser } = useAppSession(); // 👈 שימוש בקונטקסט
+const API_URL = process.env.REACT_APP_API_URL;
+console.log('API_URL variable:', API_URL);
+console.log('API_URL type:', typeof API_URL);
+console.log('Full URL being called:', `${API_URL}/api/User/login`);
 
   const handleLogin = async () => {
     setIsLoading(true);
+    
     try {
       const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/User/login`, {
+       
         email,
         password
-      });
-
+      }); 
+      onsole.log('About to call:', res);
+console.log('API URL:', apiUrl);
       const token = res.data.token;
       localStorage.setItem("token", token);
 
