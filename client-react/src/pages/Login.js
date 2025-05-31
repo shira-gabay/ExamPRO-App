@@ -12,23 +12,33 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { setCurrentUser } = useAppSession(); // 👈 שימוש בקונטקסט
-const API_URL = process.env.REACT_APP_API_URL;
-console.log('API_URL variable:', API_URL);
-console.log('API_URL type:', typeof API_URL);
-console.log('Full URL being called:', `${API_URL}/api/User/login`);
+  const { setCurrentUser } = useAppSession();
 
   const handleLogin = async () => {
     setIsLoading(true);
     
     try {
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/User/login`, {
-       
+      // Debug info - הדפסות לבדיקה
+      console.log('=== DEBUG INFO ===');
+      console.log('process.env.REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
+      console.log('process.env.NODE_ENV:', process.env.NODE_ENV);
+      console.log('All REACT_APP variables:', Object.keys(process.env).filter(key => key.startsWith('REACT_APP')));
+      
+      const API_URL = process.env.REACT_APP_API_URL;
+      console.log('API_URL variable:', API_URL);
+      console.log('API_URL type:', typeof API_URL);
+      console.log('Full URL being called:', `${API_URL}/api/User/login`);
+
+      const fullUrl = `${API_URL}/api/User/login`;
+      console.log('About to call:', fullUrl);
+      
+      const res = await axios.post(fullUrl, {
         email,
         password
       }); 
-      onsole.log('About to call:', res);
-console.log('API URL:', apiUrl);
+      
+      console.log('Response received:', res);
+
       const token = res.data.token;
       localStorage.setItem("token", token);
 
@@ -45,7 +55,8 @@ console.log('API URL:', apiUrl);
 
       navigate("/exams");
     } catch (err) {
-      console.error(err);
+      console.error('Error details:', err);
+      console.error('Error config:', err.config);
       alert("שגיאה בהתחברות, אנא נסה שוב");
     } finally {
       setIsLoading(false);
