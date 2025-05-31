@@ -1,0 +1,10 @@
+# .render.yaml
+
+services:
+  - type: web
+    name: client-react
+    env: docker
+    plan: free
+    branch: main
+    rootDir: client-react
+    dockerfilePath: Dockerfile
