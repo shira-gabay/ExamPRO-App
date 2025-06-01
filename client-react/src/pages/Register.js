@@ -7,8 +7,8 @@ import axios from "axios";
 const Register = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState(""); 
-  const [role, setRole] = useState("student"); 
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("student");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const Register = () => {
   const handleRegister = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/User/register`, {
+      const res = await axios.post(`https://exampro-app.onrender.com/api/User/register`, {
         fullName,
         email,
         password,
@@ -27,7 +27,7 @@ const Register = () => {
       localStorage.setItem("fullName", fullName);
       localStorage.setItem("email", email);
       localStorage.setItem("role", role);
-      
+
       alert("הרשמה בוצעה בהצלחה! ניתן להתחבר כעת.");
       navigate("/login"); // Go to login page after successful registration
     } catch (err) {
