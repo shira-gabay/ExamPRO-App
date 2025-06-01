@@ -51,9 +51,9 @@
                   "maximumError": "20kB"
                 },
                 {
-                  "type": "css-inline-fonts",
-                  "maximumWarning": "40kB",
-                  "maximumError": "50kB"
+                  "type": "any",
+                  "maximumWarning": "50kB",
+                  "maximumError": "60kB"
                 }
               ],
               "outputHashing": "all"
