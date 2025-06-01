@@ -28,7 +28,7 @@ export default function SubjectsFoldersPage() {
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/SubjectCategory`);
+        const response = await fetch(`https://exampro-app.onrender.com/api/SubjectCategory`);
         const data = await response.json();
         setSubjects(data);
       } catch (err) {
