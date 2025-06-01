@@ -20,7 +20,7 @@ FROM nginx:alpine
 RUN rm -rf /usr/share/nginx/html/*
 
 # העתקת התוצר המוכן של Angular ל-NGINX
-COPY --from=build /app/dist/client-angular/usr/share/nginx/html
+COPY --from=build /app/dist/client-angular /usr/share/nginx/html
 
 # פתיחת פורט 80
 EXPOSE 80
