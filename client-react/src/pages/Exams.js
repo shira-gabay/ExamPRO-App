@@ -188,7 +188,7 @@ console.log("currentSubject:", currentSubject);
   };
 
 const handleViewSaved = () => {
-  window.location.href = "http://localhost:4200/dashboard";
+  window.location.href = "https://dashboard-ro0i.onrender.com";
 };
   const handleCloseDialog = () => {
     setOpenDialog(false);
