@@ -22,7 +22,7 @@ RUN rm -rf /usr/share/nginx/html/*
 # העתקת התוצר המוכן
 COPY --from=build /app/dist/client-angular /usr/share/nginx/html
 
-# ✅ העתקת קובץ הקונפיגורציה של NGINX
+# העתקת קובץ הקונפיגורציה של NGINX
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
