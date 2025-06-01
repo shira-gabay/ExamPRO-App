@@ -7,6 +7,7 @@ import { jwtDecode } from "jwt-decode";
 import { useAppSession } from "../contexts/AppSessionContext";
 
 const Login = () => {
+  console.log("🚀 Login.js loaded");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -15,6 +16,7 @@ const Login = () => {
   const { setCurrentUser } = useAppSession(); // 👈 שימוש בקונטקסט
 
   const handleLogin = async () => {
+     console.log("🚀 handleLogin called");
     setIsLoading(true);
     try {
       const res = await axios.post(`https://exampro-app.onrender.com/api/User/login`, {

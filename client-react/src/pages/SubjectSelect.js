@@ -18,7 +18,7 @@ const { setCurrentSubject } = useAppSession();
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/SubjectCategory`);
+        const res = await axios.get(`https://exampro-app.onrender.com/api/SubjectCategory`);
         setSubjects(res.data);
       } catch (error) {
         console.error("Error fetching subjects", error);

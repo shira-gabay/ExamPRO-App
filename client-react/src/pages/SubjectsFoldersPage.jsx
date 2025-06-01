@@ -44,7 +44,7 @@ export default function SubjectsFoldersPage() {
     setExpandedSubjects((prev) => ({ ...prev, [subjectId]: !prev[subjectId] }));
     if (!examsBySubject[subjectId]) {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/Exam/by-subject?subjectId=${subjectId}`);
+        const response = await fetch(`https://exampro-app.onrender.com/api/Exam/by-subject?subjectId=${subjectId}`);
         const data = await response.json();
         const sorted = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setExamsBySubject((prev) => ({ ...prev, [subjectId]: sorted }));

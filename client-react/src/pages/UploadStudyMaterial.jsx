@@ -21,7 +21,7 @@ function UploadStudyMaterial({ examId }) {
 
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/Exam/${examId}/upload-study-material`,
+        `https://exampro-app.onrender.com/api/Exam/${examId}/upload-study-material`,
         formData,
         {
           headers: {

@@ -4,7 +4,7 @@ function SubjectsPage() {
   const [subjects, setSubjects] = useState([]);
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/education/subjects-with-materials`)
+    fetch(`https://exampro-app.onrender.com/api/education/subjects-with-materials`)
       .then(res => res.json())
       .then(data => {
         console.log("Fetched subjects:", data); // נוסיף בדיקה
