@@ -16,14 +16,14 @@ RUN npm run build -- --configuration production
 # שלב 2: שרת NGINX שמריץ את האפליקציה
 FROM nginx:alpine
 
-# מחיקת קובץ הגדרות ברירת מחדל של NGINX
+# מחיקת קבצי ברירת מחדל
 RUN rm -rf /usr/share/nginx/html/*
 
-# העתקת התוצר המוכן של Angular ל-NGINX
+# העתקת התוצר המוכן
 COPY --from=build /app/dist/client-angular /usr/share/nginx/html
 
-# פתיחת פורט 80
-EXPOSE 80
+# ✅ העתקת קובץ הקונפיגורציה של NGINX
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# הפעלת NGINX
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
