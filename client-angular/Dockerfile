@@ -1,16 +1,29 @@
-# שלב 1: בניית אפליקציה
+# שלב 1: בניית אפליקציית Angular
 FROM node:18 AS build
 
 WORKDIR /app
+
+# התקנת תלויות
 COPY package*.json ./
 RUN npm install
-COPY . .
-RUN npm run build --prod
 
-# שלב 2: שרת סטטי עם nginx
+# העתקת קבצי הפרויקט
+COPY . .
+
+# בניית האפליקציה לסביבת production
+RUN npm run build -- --configuration production
+
+# שלב 2: שרת NGINX שמריץ את האפליקציה
 FROM nginx:alpine
 
-COPY --from=build /app/build /usr/share/nginx/html
-# אפשר לשנות פורט אם צריך, ברירת מחדל 80
+# מחיקת קובץ הגדרות ברירת מחדל של NGINX
+RUN rm -rf /usr/share/nginx/html/*
+
+# העתקת התוצר המוכן של Angular ל-NGINX
+COPY --from=build /app/dist/client-angular /usr/share/nginx/html
+
+# פתיחת פורט 80
 EXPOSE 80
+
+# הפעלת NGINX
 CMD ["nginx", "-g", "daemon off;"]
