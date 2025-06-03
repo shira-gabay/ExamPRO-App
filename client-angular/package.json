@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --output-path=dist/client-angular/browser && cp dist/client-angular/browser/index.csr.html dist/client-angular/browser/index.html" ,
+    "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:client-angular": "node dist/client-angular/server/server.mjs"
