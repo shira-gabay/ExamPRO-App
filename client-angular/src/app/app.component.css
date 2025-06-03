@@ -6,7 +6,10 @@
   font-family: 'Heebo', sans-serif;
 }
 
-
+.logo {
+  height: 40px;
+  width: auto;
+}
 /* Header Section */
 .hero-header {
   position: relative;
