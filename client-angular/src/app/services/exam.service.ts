@@ -13,6 +13,6 @@ export class ExamService {
   constructor(private http: HttpClient) {}
 
   getExamsPerSubject(): Observable<{ subject: string; count: number }[]> {
-    return this.http.get<{ subject: string; count: number }[]>(`${this.apiUrl}/exams-per-subject`);
+    return this.http.get<{ subject: string; count: number }[]>(`${environment.apiUrl}/exams-per-subject`);
   }
 }
