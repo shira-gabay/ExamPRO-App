@@ -188,7 +188,7 @@ console.log("currentSubject:", currentSubject);
   };
 
 const handleViewSaved = () => {
-  window.location.href = "https://dashboard-ro0i.onrender.com";
+  window.location.href = "https://exampro-dashboard.onrender.com/";
 };
   const handleCloseDialog = () => {
     setOpenDialog(false);
