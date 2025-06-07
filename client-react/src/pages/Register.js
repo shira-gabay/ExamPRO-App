@@ -48,7 +48,7 @@ const Register = () => {
   };
 
   const roleOptions = [
-    { value: "student", label: "תלמיד" }
+    { value: "student", label: "מורה" }
   ];
 
   return (
