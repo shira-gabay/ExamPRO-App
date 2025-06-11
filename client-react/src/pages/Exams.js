@@ -37,11 +37,26 @@ useEffect(() => {
 
 
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    setSelectedFile(file);
-    setFileName(file.name);
-  };
+const handleFileChange = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // בדיקה אם הקובץ הוא מסוג doc או docx בלבד
+  const allowedExtensions = ["doc", "docx"];
+  const fileExtension = file.name.split('.').pop().toLowerCase();
+
+  if (!allowedExtensions.includes(fileExtension)) {
+    alert("נא להעלות קובץ Word בלבד (סיומות doc או docx).");
+    setSelectedFile(null);
+    setFileName("");
+    event.target.value = null; // איפוס בחירת הקובץ ב-input
+    return;
+  }
+
+  setSelectedFile(file);
+  setFileName(file.name);
+};
+
 
 const handleUploadAndGenerate = async () => {
   console.log("👤 currentUser:", currentUser);
@@ -228,11 +243,15 @@ const handleViewSaved = () => {
   >
     יצירת מבחן חכם
   </Typography>
-
+<Box textAlign="center" mb={1}>
+  <Typography variant="body1" color="text.secondary">
+   <strong>Word ‏(.docx)</strong> בלבד
+  </Typography>
+</Box>
   {/* העלאת קובץ */}
   <Box textAlign="center" mb={3}>
     <input
-      accept=".pdf,.doc,.docx,.txt"
+      accept=".doc,.docx"
       id="upload-file"
       type="file"
       onChange={handleFileChange}
